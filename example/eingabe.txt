@@ -1,0 +1,1 @@
+alg_tree.exe myStr.txt
