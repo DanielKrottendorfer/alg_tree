@@ -83,38 +83,6 @@ impl Node {
         }
     }
 
-    pub fn print_tree(&self) {
-        println!("{}", self.value);
-        match &self.left {
-            Some(x) => x.print_child(String::from("l")),
-            None => (),
-        }
-        match &self.right {
-            Some(x) => x.print_child(String::from("r")),
-            None => (),
-        }
-    }
-    fn print_child(&self, d: String) {
-        println!("{} {}", d, self.value);
-
-        match &self.left {
-            Some(x) => {
-                let mut l = d.clone();
-                l.push('l');
-                x.print_child(l)
-            }
-            None => (),
-        }
-        match &self.right {
-            Some(x) => {
-                let mut l = d.clone();
-                l.push('r');
-                x.print_child(l)
-            }
-            None => (),
-        }
-    }
-
     /*print_bal gibt die balanceFaktoren der einzelnen Zweige aus
     und gibt ein tupel der momentanen höhe und einen boll mit dem
     avlViolation status zurück*/
@@ -175,34 +143,30 @@ impl Node {
         }
     }
 
-    /* put_vec schreibt alle Werte im Baum in einen Vector
-    wenn Some dann wird der Vector in der Rekursion weitergeben*/
-    fn put_vec(&self, v: &mut Vec<i32>) {
-        v.push(self.value);
-        match &self.left {
-            Some(x) => x.put_vec(v),
-            None => (),
-        }
-        match &self.right {
-            Some(x) => x.put_vec(v),
-            None => (),
-        }
-    }
-
     /* put_vec wird aufgerufen, dann werden alle Werte aufsummiert
     und durch die Länge dividiert*/
     fn print_avg(&self) {
-        let mut v: Vec<i32> = Vec::new();
-        self.put_vec(&mut v);
+        let sc = self.sum_cnt();
+        println!(", avg: {}",sc.0 as f32/sc.1 as f32);
+    }
 
-        let mut sum = 0;
+    fn sum_cnt(&self) -> (i32,i32){
 
-        for i in &v {
-            sum += i;
+        let mut scl = (0,0);
+        let mut scr = (0,0);
+
+        match &self.left {
+            Some(x) => scl=x.sum_cnt(),
+            None => (),
+        }
+        match &self.right {
+            Some(x) => scr=x.sum_cnt(),
+            None => (),
         }
 
-        print!(", avg: {}", (sum as f32) / (v.len() as f32));
+        (scl.0+scr.0+self.value,scl.1+scr.1+1)
     }
+
     pub fn print_stats(&self) {
         if self.print_bal().1 {
             println!("AVL: no");
@@ -216,7 +180,6 @@ impl Node {
 }
 
 fn main() {
-    let a = 1.0;
     let mut arg;
 
     //argument an der Stelle 1 wird in String arg geschrieben
